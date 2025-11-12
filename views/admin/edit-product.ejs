@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<%- include('../includes/head', { pageTitle: pageTitle, stylesheet: '/product.css' }) %>
+
+    <body class="body">
+
+        <%- include('../includes/navigation', { path: path }) %>
+
+            <main class="main">
+                <form class="add-product-form" action="<%= editing ? '/admin/edit-product' : '/admin/add-product' %>"
+                    method="POST">
+                    <input class="add-product-form__input" type="text" name="title" placeholder="Enter product name"
+                        value="<%= editing ? product.title : '' %>" required>
+
+                    <input class="add-product-form__input" type="text" name="imageUrl" placeholder="Enter image URL"
+                        value="<%= editing ? product.imageUrl : '' %>" required>
+
+                    <textarea class="add-product-form__input" name="description" placeholder="Enter product description"
+                        rows="4" required><%= editing ? product.description : '' %></textarea>
+
+                    <input class="add-product-form__input" type="number" name="price" placeholder="Enter product price"
+                        step="0.01" value="<%= editing ? product.price : '' %>" required>
+
+
+                    <% if (editing) { %>
+                        <input type="hidden" name="productId" value="<%= product.id %>">
+                        <% } %>
+
+
+                            <button class="add-product-form__button" type="submit">
+                                <% if (editing) { %>
+                                    Update Product
+                                    <% } else { %>
+                                        Add Product
+                                        <% } %>
+                            </button>
+                </form>
+            </main>
+
+            <%- include('../includes/end') %>
+    </body>
+
+</html>

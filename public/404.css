@@ -1,0 +1,33 @@
+/* Center only the error container */
+.error-page__main {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    min-height: 80vh; /* enough to center message below navbar */
+    text-align: center;
+    padding: 2rem;
+}
+
+.error-page__title {
+    font-size: 3rem;
+    color: #e74c3c;
+    margin-bottom: 1rem;
+}
+
+.error-page__text {
+    font-size: 1.2rem;
+    color: #7f8c8d;
+    margin-bottom: 2rem;
+}
+
+.error-page__link {
+    text-decoration: none;
+    color: #3498db;
+    font-weight: bold;
+    transition: color 0.2s;
+}
+
+.error-page__link:hover {
+    color: #2980b9;
+}

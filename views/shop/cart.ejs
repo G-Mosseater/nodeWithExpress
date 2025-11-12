@@ -1,0 +1,52 @@
+<%- include('../includes/head', { pageTitle: pageTitle, stylesheet: '/product.css' }) %>
+  </head>
+
+  <body class="body">
+    <%- include('../includes/navigation', { path: path }) %>
+
+      <main class="main">
+        <h1>Your Cart</h1>
+
+        <div class="product-list">
+          <% if (cartProducts && cartProducts.length> 0) { %>
+            <% cartProducts.forEach(product=> { %>
+              <div class="product-card">
+                <h2 class="product-card__title">
+                  <%= product.title %>
+                </h2>
+
+                <img src="<%= product.imageUrl %>" alt="<%= product.title %>" class="product-card__img">
+
+                <p class="product-card__description">
+                  <%= product.description %>
+                </p>
+
+                <p class="product-card__price">
+                  Price: $<%= product.price %> × <%= product.qty %> = $<%= product.price * product.qty %>
+                </p>
+
+                <form action="/cart-delete-item" method="POST" class="product-card__form">
+                  <input type="hidden" name="productId" value="<%= product.id %>">
+                  <button type="submit" class="product-card__delete"
+                    style="display: inline-block; margin: 0 auto; background-color: #e74c3c; color: white; border: none; padding: 0.5rem 1rem; border-radius: 5px; cursor: pointer;">
+                    Delete
+                  </button>
+                </form>
+                <div class="cart-summary">
+                  <p><strong>Total Price:</strong> $<%= totalPrice %>
+                  </p>
+                </div>
+              </div>
+              <% }) %>
+
+
+                <% } else { %>
+                  <p>Your cart is empty.</p>
+                  <% } %>
+        </div>
+      </main>
+
+      <%- include('../includes/end') %>
+  </body>
+
+  </html>

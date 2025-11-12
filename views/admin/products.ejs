@@ -1,0 +1,44 @@
+<%- include('../includes/head', { pageTitle: pageTitle, stylesheet: '/product.css' }) %>
+
+  <body class="body">
+
+    <%- include('../includes/navigation', { path: path }) %>
+
+      <main class="main">
+        <div class="product-list">
+          <% if (prods && prods.length> 0) { %>
+            <% prods.forEach(product=> { %>
+              <div class="product-card">
+                <h2 class="product-card__title">
+                  <%= product.title %>
+                </h2>
+
+                <img src="<%= product.imageUrl %>" alt="<%= product.title %>" class="product-card__img">
+
+                <p class="product-card__description">
+                  <%= product.description %>
+                </p>
+
+                <p class="product-card__price">Price: $ <%= product.price %>
+                </p>
+                <div class="product-card__actions">
+                  <a href="/admin/edit-product/<%= product.id %>?edit=true" class="product-card__edit">Edit</a>
+                  <form action="/admin/delete-product" method="POST">
+                    <input type="hidden" value="<%= product.id %>" name="productId">
+                    <button type="submit" class="product-card__delete">Delete</button>
+                  </form>
+                </div>
+
+              </div>
+              <% }) %>
+                <% } else { %>
+                  <p class="text-muted">No products found.</p>
+                  <% } %>
+        </div>
+
+      </main>
+
+      <%- include('../includes/end') %>
+  </body>
+
+  </html>
