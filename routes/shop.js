@@ -1,5 +1,5 @@
 import express from "express";
-import { deleteCartProduct, getCart, getCheckout, getIndex, getOrders, getProduct, getProducts, postCart } from "../controllers/shop.js";
+import { deleteCartProduct, getCart, getCheckout, getIndex, getOrders, getProduct, getProducts, postCart, postOrder } from "../controllers/shop.js";
 import path from 'path'
 // import { fileURLToPath } from "url";
 
@@ -23,6 +23,7 @@ router.post('/cart-delete-item', deleteCartProduct)
 
 router.get('/orders', getOrders)
 
+router.post('/create-order', postOrder)
 
 router.get('/checkout', getCheckout)
 

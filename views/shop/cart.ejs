@@ -24,6 +24,9 @@
                 <p class="product-card__price">
                   Price: $<%= product.price %> × <%= product.qty %> = $<%= product.price * product.qty %>
                 </p>
+                <p>Quantity: <%= product.cartItem.quantity %>
+                </p>
+
 
                 <form action="/cart-delete-item" method="POST" class="product-card__form">
                   <input type="hidden" name="productId" value="<%= product.id %>">
@@ -35,6 +38,13 @@
                 <div class="cart-summary">
                   <p><strong>Total Price:</strong> $<%= totalPrice %>
                   </p>
+
+                  <form action="/create-order" method="POST">
+                    <button type="submit"
+                      style="background-color: #2ecc71; color: white; border: none; padding: 0.75rem 1.5rem; border-radius: 5px; cursor: pointer;">
+                      Order Now
+                    </button>
+                  </form>
                 </div>
               </div>
               <% }) %>

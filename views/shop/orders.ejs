@@ -1,13 +1,46 @@
-<%- include('../includes/head', { pageTitle: 'Your Cart', stylesheet: '/product.css' }) %>
-</head>
-<body>
-  <%- include('../includes/navigation', { path: '/orders' }) %>
+<%- include('../includes/head', { pageTitle: pageTitle, stylesheet: '/product.css' }) %>
+  </head>
 
-  <main class="main">
-    <h1>Nothing there</h1>
-    <p>This is the cart page.</p>
-  </main>
+  <body class="body">
+    <%- include('../includes/navigation', { path: path }) %>
 
-  <%- include('../includes/end') %>
-</body>
-</html>
+      <main class="main">
+        <h1>Your Orders</h1>
+
+        <% if (orders && orders.length> 0) { %>
+          <% orders.forEach(order=> { %>
+            <h2>Order #<%= order.id %> - Placed on <%= order.createdAt.toDateString() %>
+            </h2>
+            <div class="product-list">
+              <% order.products.forEach(product=> { %>
+                <div class="product-card">
+                  <h2 class="product-card__title">
+                    <%= product.title %>
+                  </h2>
+
+                  <img src="<%= product.imageUrl %>" alt="<%= product.title %>" class="product-card__img">
+
+                  <p class="product-card__description">
+                    <%= product.description %>
+                  </p>
+
+                  <p class="product-card__price">
+                    Price: $<%= product.price %> × <%= product.orderItem.quantity %> = $<%= product.price *
+                          product.orderItem.quantity %>
+                  </p>
+
+                  <p>Quantity: <%= product.orderItem.quantity %>
+                  </p>
+                </div>
+                <% }) %>
+            </div>
+            <% }) %>
+              <% } else { %>
+                <p>You have no orders yet.</p>
+                <% } %>
+      </main>
+
+      <%- include('../includes/end') %>
+  </body>
+
+  </html>
