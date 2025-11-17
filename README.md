@@ -16,3 +16,11 @@ In this project, I explored different ways to work with databases in a Node.js a
 
 Overall, this project was about learning **different ways to structure, relate, and manage data**, and seeing how NoSQL and SQL compare in real projects
 
+## Frontend
+
+For the frontend, I used **EJS** instead of React since it:
+
+- Simplifies handling sessions and dynamic views
+- Easy to integrate for smaller projects
+  
+This setup allowed me to focus on backend logic and database operations.
