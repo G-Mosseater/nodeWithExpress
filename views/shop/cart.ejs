@@ -21,23 +21,24 @@
                   <%= product.description %>
                 </p>
 
-                <p class="product-card__price">
-                  Price: $<%= product.price %> × <%= product.qty %> = $<%= product.price * product.qty %>
+                <p>Price: $<%= product.product.price %> × <%= product.quantity %> = $<%= product.product.price *
+                        product.quantity %>
                 </p>
-                <p>Quantity: <%= product.cartItem.quantity %>
+
+                <p>Quantity: <%= product.quantity %>
+                </p>
                 </p>
 
 
                 <form action="/cart-delete-item" method="POST" class="product-card__form">
-                  <input type="hidden" name="productId" value="<%= product.id %>">
+                  <input type="hidden" name="productId" value="<%= product.product._id %>">
                   <button type="submit" class="product-card__delete"
                     style="display: inline-block; margin: 0 auto; background-color: #e74c3c; color: white; border: none; padding: 0.5rem 1rem; border-radius: 5px; cursor: pointer;">
                     Delete
                   </button>
                 </form>
                 <div class="cart-summary">
-                  <p><strong>Total Price:</strong> $<%= totalPrice %>
-                  </p>
+
 
                   <form action="/create-order" method="POST">
                     <button type="submit"

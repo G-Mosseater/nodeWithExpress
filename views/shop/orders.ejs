@@ -12,7 +12,7 @@
             <h2>Order #<%= order.id %> - Placed on <%= order.createdAt.toDateString() %>
             </h2>
             <div class="product-list">
-              <% order.products.forEach(product=> { %>
+              <% order.items.forEach(product=> { %>
                 <div class="product-card">
                   <h2 class="product-card__title">
                     <%= product.title %>
@@ -25,11 +25,11 @@
                   </p>
 
                   <p class="product-card__price">
-                    Price: $<%= product.price %> × <%= product.orderItem.quantity %> = $<%= product.price *
-                          product.orderItem.quantity %>
+                    Price: $<%= product.price %> × <%= product.quantity %> = $<%= product.price *
+                          product.quantity %>
                   </p>
 
-                  <p>Quantity: <%= product.orderItem.quantity %>
+                  <p>Quantity: <%= product.quantity %>
                   </p>
                 </div>
                 <% }) %>
