@@ -1,0 +1,34 @@
+<%- include('../includes/head', { pageTitle: "Reset Password", stylesheet: '/product.css' }) %>
+
+<body class="body">
+  <%- include('../includes/navigation', { path: path }) %>
+
+  <main class="main">
+    <% if (errorMessage && errorMessage.length > 0) { %>
+      <div class="alert alert-danger">
+        <%= errorMessage[0] %>
+      </div>
+    <% } %>
+
+
+    <form class="login-form" action="/reset" method="POST">
+      <h1 class="login-form__title">Reset Password</h1>
+
+    
+      <input 
+        class="login-form__input" 
+        type="email" 
+        name="email" 
+        placeholder="Enter your registered email" 
+        required
+      >
+
+      <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+
+      <button class="login-form__button" type="submit">Send Reset Link</button>
+    </form>
+  </main>
+
+  <%- include('../includes/end') %>
+</body>
+</html>

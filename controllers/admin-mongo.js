@@ -5,14 +5,13 @@ import { findAllProducts } from '../models/productMongo.js'
 
 export const postAddProduct = async (req, res) => {
     const { title, price, imageUrl, description } = req.body
-    const userId = req.user
     try {
         const product = new Product({
             title,
             price: parseFloat(price),
             imageUrl,
             description,
-            userId
+            userId: req.user._id
         })
 
         await product.save()
@@ -24,10 +23,13 @@ export const postAddProduct = async (req, res) => {
 
 
 export const getAddProduct = async (req, res) => {
+
+
     res.render("admin/edit-product", {
         pageTitle: "Add Product",
         path: "/admin/add-product",
-        editing: false
+        editing: false,
+
     });
 }
 
@@ -35,11 +37,15 @@ export const getAddProduct = async (req, res) => {
 export const getProducts = async (req, res) => {
 
     try {
-        const products = await findAllProducts()
+        const userId = req.user._id;
+
+        const products = await Product.find({ userId: userId })
         res.render('admin/products', {
             prods: products,
             pageTitle: 'Admin Products',
-            path: '/admin/products'
+            path: '/admin/products',
+
+
         });
         console.log(products)
     } catch (err) {
@@ -64,7 +70,9 @@ export const getEditProduct = async (req, res) => {
             pageTitle: 'Edit Product',
             path: '/admin/edit-product',
             editing: editMode,
-            product: product
+            product: product,
+
+
         })
     }
     catch (err) {
@@ -88,21 +96,30 @@ export const postEditProduct = async (req, res) => {
     }
 
     try {
-        const updatedProduct = await Product.findByIdAndUpdate(
-            prodId, updatedData,
-            { new: true }
-        )
-        if (!updatedProduct) {
+        const product = await Product.findById(prodId)
+        if (!product) {
             console.log("Product not found.");
             return res.redirect("/admin/products");
         }
-        res.redirect("/admin/products");
+
+        if (product.userId.toString() !== req.user._id.toString()) {
+            console.log('Unauthorized attempt!')
+            return res.redirect('/admin/products')
+        }
+
+        product.title = updatedData.title
+        product.price = updatedData.price
+        product.imageUrl = updatedData.imageUrl
+        product.description = updatedData.description
+
+        await product.save()
+        res.redirect("/admin/products")
 
     }
     catch (err) {
         console.error(err)
+        res.redirect("/admin/products")
     }
-
 }
 
 
@@ -113,11 +130,21 @@ export const postDeleteProduct = async (req, res) => {
         return res.status(400).send("Invalid product ID")
     }
     try {
-        const deletedProduct = await Product.findByIdAndDelete(prodId)
 
-        if (!deletedProduct) {
-            console.log('No product deleted (product not found)');
+        const product = await Product.findById(prodId)
+
+        if (!product) {
+            console.log('No product found');
+            return res.redirect("/admin/products")
         }
+
+        if (product.userId.toString() !== req.user._id.toString()) {
+            console.log("Unauthorized access")
+            return res.redirect('/admin/products')
+        }
+
+        await Product.findByIdAndDelete(prodId)
+
         res.redirect("/admin/products")
     }
     catch (err) {

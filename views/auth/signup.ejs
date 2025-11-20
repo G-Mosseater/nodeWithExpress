@@ -1,0 +1,37 @@
+<html lang="en">
+<%- include('../includes/head', { pageTitle: "Signup" , stylesheet: '/product.css' }) %>
+
+  <body class="body">
+
+    <%- include('../includes/navigation', { path: path }) %>
+
+      <main class="main">
+
+        <form class="login-form" action="/signup" method="POST">
+
+          <h1 class="login-form__title">Signup</h1>
+
+          <label for="email" class="login-form__label">Email</label>
+          <input id="email" class="login-form__input" type="email" name="email" placeholder="Enter your email" required>
+
+          <label for="password" class="login-form__label">Password</label>
+          <input id="password" class="login-form__input" type="password" name="password"
+            placeholder="Enter your password" required>
+
+          <label for="confirmPassword" class="login-form__label">Confirm Password</label>
+          <input id="confirmPassword" class="login-form__input" type="password" name="confirmPassword"
+            placeholder="Confirm your password">
+          <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+
+          <button class="login-form__button" type="submit">
+            Signup
+          </button>
+
+        </form>
+
+      </main>
+
+      <%- include('../includes/end') %>
+  </body>
+
+</html>

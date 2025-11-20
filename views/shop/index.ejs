@@ -1,49 +1,46 @@
 <%- include('../includes/head', { pageTitle: pageTitle, stylesheet: '/product.css' }) %>
 
-    <body class="body">
+  <body class="body">
 
-        <%- include('../includes/navigation', { path: path }) %>
+    <%- include('../includes/navigation', { path: path, isAuthenticated: isAuthenticated }) %>
 
-            <main class="main">
-                <div class="product-list">
-                    <% if (prods && prods.length> 0) { %>
-                        <% prods.forEach(product=> { %>
-                            <div class="product-card">
-                                <!-- Product Title -->
-                                <h2 class="product-card__title">
-                                    <%= product.title %>
-                                </h2>
+      <main class="main">
+        <div class="product-list">
+          <% if (prods && prods.length> 0) { %>
+            <% prods.forEach(product=> { %>
+              <div class="product-card">
+                <h2 class="product-card__title">
+                  <%= product.title %>
+                </h2>
 
-                                <!-- Product Image -->
-                                <img src="<%= product.imageUrl %>" alt="<%= product.title %>" class="product-card__img">
+                <img src="<%= product.imageUrl %>" alt="<%= product.title %>" class="product-card__img">
 
-                                <!-- Product Description -->
-                                <p class="product-card__description">
-                                    <%= product.description %>
-                                </p>
+                <p class="product-card__description">
+                  <%= product.description %>
+                </p>
 
-                                <!-- Product Price -->
-                                <p class="product-card__price">Price: $ <%= product.price %>
-                                </p>
+                <p class="product-card__price">Price: $ <%= product.price %>
+                </p>
 
-                                <!-- Add to Cart Button -->
-                                <div class="product-card__actions">
-                                    <form action="/cart" method="POST">
-                                        <button type="submit" class="product-card__add-to-cart">Add to
-                                            cart</button>
-                                        <input type="hidden" name="productId" value="<%= product._id %>">
-                                    </form>
-                                </div>
-                            </div>
-                            <% }) %>
-                                <% } else { %>
-                                    <p class="text-muted">No products found.</p>
-                                    <% } %>
-                </div>
+                <% if (isAuthenticated) { %>
+                  <div class="product-card__actions">
+                    <form action="/cart" method="POST">
+                      <input type="hidden" name="_csrf" value="<%= csrfToken %>">
 
-            </main>
+                      <button type="submit" class="product-card__add-to-cart">Add to cart</button>
+                      <input type="hidden" name="productId" value="<%= product._id %>">
+                    </form>
+                  </div>
+                  <% } %>
+              </div>
+              <% }) %>
+                <% } else { %>
+                  <p class="text-muted">No products found.</p>
+                  <% } %>
+        </div>
+      </main>
 
-            <%- include('../includes/end') %>
-    </body>
+      <%- include('../includes/end') %>
+  </body>
 
-    </html>
+  </html>

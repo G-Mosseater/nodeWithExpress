@@ -1,10 +1,16 @@
 import { fetchProductById, Product } from "../models/productMongo.js";
 import mongoose from "mongoose";
 import { Order } from "../models/ordersMongo.js";
+import { User } from "../models/userMongo.js";
+
+
 export const getIndex = async (req, res) => {
     try {
         const products = await Product.find()
-        res.render('shop/index', { prods: products, pageTitle: 'Shop', path: '/' })
+        res.render('shop/index', {
+            prods: products, pageTitle: 'Shop', path: '/',
+            csrfToken: req.csrfToken()
+        })
 
     } catch (err) {
         console.error(err)
@@ -14,7 +20,9 @@ export const getIndex = async (req, res) => {
 export const getProducts = async (req, res) => {
     try {
         const products = await Product.find()
-        res.render('shop/product-list', { prods: products, pageTitle: 'Products', path: '/products' })
+        res.render('shop/product-list', {
+            prods: products, pageTitle: 'Products', path: '/products'
+        })
 
     } catch (err) {
         console.error(err)
@@ -34,7 +42,10 @@ export const getProduct = async (req, res) => {
         res.render('shop/product-detail', {
             product,
             pageTitle: product.title,
-            path: '/products'
+            path: '/products', isAuthenticated: !!req.user
+
+
+
         });
     }
     catch (err) {
@@ -61,15 +72,15 @@ export const postAddToCart = async (req, res) => {
 export const getCart = async (req, res) => {
 
     try {
+        const user = await User.findById(req.session.userId).populate('cart.items.productId')
+        if (!user) return res.redirect("/login")
 
-        await req.user.populate('cart.items.productId')
-
-        const cartProducts = req.user.cart.items.map(
+        const cartProducts = user.cart.items.map(
             item => ({
                 product: item.productId,
                 quantity: item.quantity
             })
-        )
+        ).filter(item => item.product)
 
         res.render("shop/cart", {
             path: "/cart",
@@ -96,7 +107,9 @@ export const postDeleteCartItem = async (req, res) => {
 export const postOrder = async (req, res) => {
 
     try {
-        await req.user.createOrder()
+        const user = await User.findById(req.session.userId);
+        if (!user) return res.redirect("/login")
+        await user.createOrder()
         res.redirect('/orders')
     } catch (err) {
         console.error(err)
@@ -105,9 +118,10 @@ export const postOrder = async (req, res) => {
 
 export const getAllOrders = async (req, res) => {
     try {
+        const user = await User.findById(req.session.userId);
+        if (!user) return res.redirect("/login")
 
-        const userId = req.user._id
-        const orders = await Order.find({ "user.userId": userId }).sort({ createdAt: -1 })
+        const orders = await Order.find({ "user.userId": user._id }).sort({ createdAt: -1 })
         res.render('shop/orders', {
             path: '/orders',
             pageTitle: 'Your Orders',

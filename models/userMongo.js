@@ -3,9 +3,10 @@ import { Schema } from "mongoose";
 import { Order } from "./ordersMongo.js";
 
 const userSchema = new mongoose.Schema({
-    name: { type: String, required: true },
-
     email: { type: String, required: true, unique: true },
+    password: { type: String, required: true },
+    resetToken: String,
+    resetTokenExpiration: Date,
     cart: {
         items: [{
             productId: {
@@ -68,7 +69,7 @@ userSchema.methods.createOrder = async function () {
     const order = new Order({
         items: orderItems,
         user: {
-            name: this.name,
+            email: this.email,
             userId: this._id
         }
     })

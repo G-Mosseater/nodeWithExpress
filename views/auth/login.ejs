@@ -1,0 +1,29 @@
+<%- include('../includes/head', { pageTitle: "Login" , stylesheet: '/product.css' }) %>
+
+  <body class="body">
+    <%- include('../includes/navigation', { path: path }) %>
+
+      <main class="main">
+        <% if (errorMessage && errorMessage.length> 0) { %>
+          <div class="alert alert-danger">
+            <%= errorMessage[0] %>
+          </div>
+          <% } %>
+
+            <form class="login-form" action="/login" method="POST">
+              <h1 class="login-form__title">Login</h1>
+
+              <input class="login-form__input" type="email" name="email" placeholder="Enter your email" required>
+              <input class="login-form__input" type="password" name="password" placeholder="Enter your password"
+                required>
+              <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+
+              <button class="login-form__button" type="submit">Login</button>
+            </form>
+            <a href="/reset">Reset Password</a>
+      </main>
+
+      <%- include('../includes/end') %>
+  </body>
+
+  </html>

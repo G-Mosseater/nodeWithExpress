@@ -1,7 +1,15 @@
+import dotenv from "dotenv";
+import path from "path";
+dotenv.config({ path: path.resolve("./.env") });
 import express from 'express';
 import { router as AdminRoutes } from './routes/admin.js'
 import { router as shopRoutes } from './routes/shop.js'
+import { router as authRoutes } from './routes/auth.js'
 import { User } from './models/userMongo.js';
+import session from 'express-session';
+import MongoDBStore from 'connect-mongodb-session'
+import csrf from 'csurf';
+import flash from "connect-flash/lib/flash.js";
 // import { notFound } from './controllers/error.js';
 // import { connectMongo, getDb } from './util/db.js';
 import { connectDb } from './util/db.js'
@@ -14,43 +22,61 @@ import { connectDb } from './util/db.js'
 // import { OrderItem } from './models/order-item.js';
 
 const app = express();
-
+const csrfProtection = csrf()
+const Store = MongoDBStore(session)
 app.set('view engine', 'ejs')
 
+const store = new Store({
+
+    uri: process.env.MONGODB_URI,
+    collection: 'sessions'
+
+})
 app.use(express.urlencoded({ extended: true }))
 app.use(express.static('public'))
+app.use(session({ secret: 'secretValue', resave: false, saveUninitialized: false, store: store }))
+
+app.use(flash())
+app.use(csrfProtection)
+
+app.use(async (req, res, next) => {
+    if (!req.session.userId) {
+        req.user = null
+        return next()
+    }
+    try {
+        const user = await User.findById(req.session.userId)
+        req.user = user || null
+        next()
+    } catch (err) {
+        console.error(err)
+        next()
+    }
+})
+
+app.use((req, res, next) => {
+    res.locals.isAuthenticated = req.session.isLoggedIn;
+    res.locals.csrfToken = req.csrfToken();
+    res.locals.errorMessage = req.flash('error');
+    next()
+
+})
+
 
 const startServer = async () => {
     try {
         await connectDb();
         console.log('Connected to Mongo');
 
-        let user = await User.findOne({ email: 'admin@example.com' });
-        if (!user) {
-            user = new User({
-                name: 'Admin',
-                email: 'admin@example.com',
-                cart: { items: [] }
-            });
-            await user.save();
-            console.log('Default admin user created');
-        }
-
-        app.use((req, res, next) => {
-            req.user = user;
-            next();
-        });
-
         app.use('/admin', AdminRoutes);
         app.use(shopRoutes);
+        app.use(authRoutes)
 
         app.listen(3000, () => {
             console.log('Server started!');
         });
 
     } catch (err) {
-
-
         console.error('Error starting server:', err);
     }
 };
