@@ -7,35 +7,47 @@
         <%- include('../includes/navigation', { path: path }) %>
 
             <main class="main">
-                <form class="add-product-form" action="<%= editing ? '/admin/edit-product' : '/admin/add-product' %>"
-                    method="POST">
-                    <input class="add-product-form__input" type="text" name="title" placeholder="Enter product name"
-                        value="<%= editing ? product.title : '' %>" required>
+                <% if (errorMessage && errorMessage.length> 0) { %>
+                    <div class="alert alert-danger">
+                        <%= errorMessage %>
+                    </div>
+                    <% } %>
+                        <form class="add-product-form"
+                            action="<%= editing ? '/admin/edit-product' : '/admin/add-product' %>" novalidate
+                            method="POST" enctype="multipart/form-data">
 
-                    <input class="add-product-form__input" type="text" name="imageUrl" placeholder="Enter image URL"
-                        value="<%= editing ? product.imageUrl : '' %>" required>
+                            <label for="title">Product Name</label>
+                            <input id="title" class="add-product-form__input" type="text" name="title"
+                                placeholder="Enter product name" value="<%= editing ? product.title : '' %>">
 
-                    <textarea class="add-product-form__input" name="description" placeholder="Enter product description"
-                        rows="4" required><%= editing ? product.description : '' %></textarea>
+                            <!-- <label for="imageUrl">Image URL</label>
+                    <input id="imageUrl" class="add-product-form__input" type="text" name="imageUrl"
+                        placeholder="Enter image URL" value="<%= editing ? product.imageUrl : '' %>"> -->
 
-                    <input class="add-product-form__input" type="number" name="price" placeholder="Enter product price"
-                        step="0.01" value="<%= editing ? product.price : '' %>" required>
+                            <label for="image">Image </label>
+                            <input id="image" class="add-product-form__input" type="file" name="image"
+                                placeholder="Uploade an image">
 
+                            <label for="description">Description</label>
+                            <textarea id="description" class="add-product-form__input" name="description"
+                                placeholder="Enter product description"
+                                rows="4"><%= editing ? product.description : '' %></textarea>
 
-                    <% if (editing) { %>
-                        <input type="hidden" name="productId" value="<%= product._id %>">
-                        <% } %>
+                            <label for="price">Price</label>
+                            <input id="price" class="add-product-form__input" type="number" name="price"
+                                placeholder="Enter product price" step="0.01"
+                                value="<%= editing ? product.price : '' %>">
 
-                            <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                            <% if (editing) { %>
+                                <input type="hidden" name="productId" value="<%= product._id %>">
+                                <% } %>
 
-                            <button class="add-product-form__button" type="submit">
-                                <% if (editing) { %>
-                                    Update Product
-                                    <% } else { %>
-                                        Add Product
-                                        <% } %>
-                            </button>
-                </form>
+                                    <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+
+                                    <button class="add-product-form__button" type="submit">
+                                        <%= editing ? 'Update Product' : 'Add Product' %>
+                                    </button>
+                        </form>
             </main>
 
             <%- include('../includes/end') %>

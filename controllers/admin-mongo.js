@@ -1,16 +1,44 @@
 import mongoose from "mongoose";
 import { fetchProductById, Product } from "../models/productMongo.js";
 import { findAllProducts } from '../models/productMongo.js'
+import { validationResult } from 'express-validator';
+
+
+
 
 
 export const postAddProduct = async (req, res) => {
-    const { title, price, imageUrl, description } = req.body
+    const { title, price, description } = req.body
+    const errors = validationResult(req)
+    const imageFile = req.file
+    if (!imageFile) {
+        return res.status(422).render('admin/edit-product', {
+            pageTitle: 'Add Product',
+            path: '/admin/add-product',
+            editing: false,
+            errorMessage: 'Attached file is not an image',
+            oldInput: req.body,
+            validationErrors: []
+        });
+    }
+    if (!errors.isEmpty()) {
+        return res.status(422).render('admin/edit-product', {
+            pageTitle: 'Add Product',
+            path: '/admin/add-product',
+            editing: false,
+            errorMessage: errors.array()[0].msg,
+            oldInput: req.body,
+            validationErrors: errors.array()
+        });
+    }
+
+    const imageUrl = imageFile.path
     try {
         const product = new Product({
             title,
             price: parseFloat(price),
-            imageUrl,
             description,
+            imageUrl: imageUrl,
             userId: req.user._id
         })
 
@@ -37,6 +65,10 @@ export const getAddProduct = async (req, res) => {
 export const getProducts = async (req, res) => {
 
     try {
+        if (!req.user) {
+            console.log("User not logged in or not found");
+            return res.redirect("/login")
+        }
         const userId = req.user._id;
 
         const products = await Product.find({ userId: userId })
@@ -85,6 +117,25 @@ export const getEditProduct = async (req, res) => {
 export const postEditProduct = async (req, res) => {
 
     const prodId = req.body.productId
+    const errors = validationResult(req);
+    const imageFile = req.file
+    if (!errors.isEmpty()) {
+        return res.status(422).render('admin/edit-product', {
+            pageTitle: 'Edit Product',
+            path: '/admin/edit-product',
+            editing: true,
+            hasError: true,
+            product: {
+                _id: prodId,
+                title: req.body.title,
+                price: req.body.price,
+                description: req.body.description,
+
+            },
+            errorMessage: errors.array()[0].msg
+        });
+    }
+
     if (!mongoose.Types.ObjectId.isValid(prodId)) {
         return res.status(400).send("Invalid product ID")
     }
@@ -109,8 +160,10 @@ export const postEditProduct = async (req, res) => {
 
         product.title = updatedData.title
         product.price = updatedData.price
-        product.imageUrl = updatedData.imageUrl
         product.description = updatedData.description
+        if (imageFile) {
+            product.imageUrl = imageFile.path
+        }
 
         await product.save()
         res.redirect("/admin/products")

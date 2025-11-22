@@ -10,6 +10,7 @@ import session from 'express-session';
 import MongoDBStore from 'connect-mongodb-session'
 import csrf from 'csurf';
 import flash from "connect-flash/lib/flash.js";
+import multer from "multer";
 // import { notFound } from './controllers/error.js';
 // import { connectMongo, getDb } from './util/db.js';
 import { connectDb } from './util/db.js'
@@ -24,7 +25,28 @@ import { connectDb } from './util/db.js'
 const app = express();
 const csrfProtection = csrf()
 const Store = MongoDBStore(session)
+
+
 app.set('view engine', 'ejs')
+
+const fileStorage = multer.diskStorage({
+    destination: (req, file, cb) => {
+        cb(null, 'images')
+    },
+    filename: (req, file, cb) => {
+        cb(null, Date.now() + '-' + file.originalname)
+    }
+})
+
+const fileFilter = (req, file, cb) => {
+
+    if (file.mimetype === 'image/png' || file.mimetype === 'image/jpeg' || file.minmetype === 'image/jpg') {
+        cb(null, true)
+    } else {
+        cb(null, false)
+    }
+}
+app.use(multer({ storage: fileStorage, fileFilter: fileFilter }).single('image'))
 
 const store = new Store({
 
@@ -34,7 +56,12 @@ const store = new Store({
 })
 app.use(express.urlencoded({ extended: true }))
 app.use(express.static('public'))
+app.use('/images', express.static('images'));
+
 app.use(session({ secret: 'secretValue', resave: false, saveUninitialized: false, store: store }))
+
+
+
 
 app.use(flash())
 app.use(csrfProtection)

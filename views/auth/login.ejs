@@ -6,14 +6,14 @@
       <main class="main">
         <% if (errorMessage && errorMessage.length> 0) { %>
           <div class="alert alert-danger">
-            <%= errorMessage[0] %>
+            <%= errorMessage %>
           </div>
           <% } %>
 
-            <form class="login-form" action="/login" method="POST">
+            <form class="login-form" action="/login" method="POST" novalidate>
               <h1 class="login-form__title">Login</h1>
 
-              <input class="login-form__input" type="email" name="email" placeholder="Enter your email" required>
+              <input class="login-form__input" type="email" name="email" placeholder="Enter your email">
               <input class="login-form__input" type="password" name="password" placeholder="Enter your password"
                 required>
               <input type="hidden" name="_csrf" value="<%= csrfToken %>">
