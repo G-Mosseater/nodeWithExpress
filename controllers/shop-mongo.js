@@ -2,6 +2,10 @@ import { fetchProductById, Product } from "../models/productMongo.js";
 import mongoose from "mongoose";
 import { Order } from "../models/ordersMongo.js";
 import { User } from "../models/userMongo.js";
+import fs from 'fs'
+import path from "path";
+import PDFDocument from "pdfkit";
+
 
 
 export const getIndex = async (req, res) => {
@@ -130,6 +134,59 @@ export const getAllOrders = async (req, res) => {
     } catch (err) {
         console.error(err)
     }
+}
+
+export const getInvoice = async (req, res, next) => {
+
+    const orderId = req.params.orderId
+
+    try {
+        const order = await Order.findById(orderId)
+        if (!order) {
+            throw new Error('Order not found')
+        }
+        if (order.user.userId.toString() !== req.user._id.toString()) {
+
+            next(new Error('Unauthorized access'))
+            return res.redirect('/orders')
+        }
+        const invoiceName = 'invoice-' + orderId + '.pdf'
+        const invoicePath = path.join('data', 'invoices', invoiceName)
+        const pdfDoc = new PDFDocument()
+        res.setHeader('Content-Type', 'application/pdf')
+        res.setHeader('Content-Disposition', `inline; filename="${invoiceName}"`)
+        pdfDoc.pipe(fs.createWriteStream(invoicePath))
+        pdfDoc.pipe(res)
+
+        pdfDoc.fontSize(26).text('Orders', {
+            underline: true
+        })
+        pdfDoc.text('----------------------------')
+        order.items.forEach(item => {
+
+            pdfDoc.text(`${item.productData.title} - ${item.quantity} x $${item.productData.price}`)
+        })
+        pdfDoc.end()
+
+        // fs.readFile(invoicePath, (err, data) => {
+        //     if (err) {
+        //         return next(err)
+        //     }
+        //     res.setHeader('Content-Type', 'application/pdf')
+        //     res.setHeader('Content-Disposition', `inline; filename="${invoiceName}"`)
+        //     res.send(data)
+        // })
+
+        // For large files
+        // const file = fs.createReadStream(invoicePath)
+        // res.setHeader('Content-Type', 'application/pdf')
+        // res.setHeader('Content-Disposition', `inline; filename="${invoiceName}"`)
+        // file.pipe(res)
+    }
+    catch (err) {
+        console.error(err)
+    }
+
 }
 
 // Without mongoose //

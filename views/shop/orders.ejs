@@ -7,40 +7,38 @@
       <main class="main">
         <h1>Your Orders</h1>
 
-        <% if (orders && orders.length> 0) { %>
-          <% orders.forEach(order=> { %>
-            <h2>Order #<%= order.id %> - Placed on <%= order.createdAt.toDateString() %>
-            </h2>
+        <% if (orders && orders.length > 0) { %>
+          <% orders.forEach(order => { %>
+            <h2>Order #<%= order.id %> - Placed on <%= order.createdAt.toDateString() %></h2>
             <div class="product-list">
-              <% order.items.forEach(product=> { %>
+              <% order.items.forEach(item => { %>
                 <div class="product-card">
                   <h2 class="product-card__title">
-                    <%= product.title %>
+                    <%= item.productData.title %>
                   </h2>
 
-                  <img src="<%= product.imageUrl %>" alt="<%= product.title %>" class="product-card__img">
+                  <img src="/<%= item.productData.imageUrl %>" alt="<%= item.productData.title %>" class="product-card__img">
 
                   <p class="product-card__description">
-                    <%= product.description %>
+                    <%= item.productData.description %>
                   </p>
 
                   <p class="product-card__price">
-                    Price: $<%= product.price %> × <%= product.quantity %> = $<%= product.price *
-                          product.quantity %>
+                    Price: $<%= item.productData.price %> × <%= item.quantity %> = $<%= item.productData.price * item.quantity %>
                   </p>
 
-                  <p>Quantity: <%= product.quantity %>
+                  <p>Quantity: <%= item.quantity %>
+                      <a href="/orders/<%= order._id %>">Invoice</a>
                   </p>
                 </div>
-                <% }) %>
+              <% }) %>
             </div>
-            <% }) %>
-              <% } else { %>
-                <p>You have no orders yet.</p>
-                <% } %>
+          <% }) %>
+        <% } else { %>
+          <p>You have no orders yet.</p>
+        <% } %>
       </main>
 
       <%- include('../includes/end') %>
   </body>
-
-  </html>
+</html>

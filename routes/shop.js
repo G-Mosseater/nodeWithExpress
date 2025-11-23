@@ -1,6 +1,6 @@
 import express from "express";
 import { isAuth } from "../middleware/isAuth.js";
-import { getAllOrders, postOrder, postDeleteCartItem, getIndex, getProducts, getProduct, postAddToCart, getCart } from "../controllers/shop-mongo.js";
+import { getAllOrders, postOrder, postDeleteCartItem, getIndex, getProducts, getProduct, postAddToCart, getCart, getInvoice } from "../controllers/shop-mongo.js";
 // import { getProducts, getIndex, getProduct, postAddToCart, getCart, postDeleteCartItem, postOrder, getAllOrders } from "../controllers/shop-mongo.js"
 // // import { deleteCartProduct, getCart, getCheckout, getIndex, getOrders, getProduct, getProducts, postCart, postOrder } from "../controllers/shop.js";
 // // import path from 'path'
@@ -27,6 +27,8 @@ router.post('/cart-delete-item', isAuth, postDeleteCartItem)
 router.get('/orders', isAuth, getAllOrders)
 
 router.post('/create-order', isAuth, postOrder)
+
+router.get('/orders/:orderId', isAuth, getInvoice)
 
 // // router.get('/checkout', getCheckout)
 

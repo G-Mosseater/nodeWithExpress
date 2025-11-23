@@ -6,7 +6,6 @@ import { validationResult } from 'express-validator';
 
 
 
-
 export const postAddProduct = async (req, res) => {
     const { title, price, description } = req.body
     const errors = validationResult(req)
