@@ -1,3 +1,6 @@
+import Stripe from "stripe";
+import dotenv from "dotenv";
+dotenv.config();
 import { fetchProductById, Product } from "../models/productMongo.js";
 import mongoose from "mongoose";
 import { Order } from "../models/ordersMongo.js";
@@ -6,14 +9,22 @@ import fs from 'fs'
 import path from "path";
 import PDFDocument from "pdfkit";
 
-
-
+const ITEMS_PER_PAGE = 2
 export const getIndex = async (req, res) => {
+    const page = +req.query.page || 1
+
     try {
-        const products = await Product.find()
+        const totalItems = await Product.countDocuments()
+        const products = await Product.find().skip((page - 1) * ITEMS_PER_PAGE).limit(ITEMS_PER_PAGE)
         res.render('shop/index', {
             prods: products, pageTitle: 'Shop', path: '/',
-            csrfToken: req.csrfToken()
+            csrfToken: req.csrfToken(),
+            currentPage: page,
+            hasNextPage: ITEMS_PER_PAGE * page < totalItems,
+            hasPreviousPage: page > 1,
+            nextPage: page + 1,
+            previousPage: page - 1,
+            lastPage: Math.ceil(totalItems / ITEMS_PER_PAGE)
         })
 
     } catch (err) {
@@ -22,10 +33,17 @@ export const getIndex = async (req, res) => {
 }
 
 export const getProducts = async (req, res) => {
+    const page = +req.query.page || 1
+    const totalItems = await Product.countDocuments()
     try {
-        const products = await Product.find()
+        const products = await Product.find().skip((page - 1) * ITEMS_PER_PAGE).limit(ITEMS_PER_PAGE)
         res.render('shop/product-list', {
-            prods: products, pageTitle: 'Products', path: '/products'
+            prods: products, pageTitle: 'Products', path: '/products', currentPage: page,
+            hasNextPage: ITEMS_PER_PAGE * page < totalItems,
+            hasPreviousPage: page > 1,
+            nextPage: page + 1,
+            previousPage: page - 1,
+            lastPage: Math.ceil(totalItems / ITEMS_PER_PAGE)
         })
 
     } catch (err) {
@@ -108,7 +126,62 @@ export const postDeleteCartItem = async (req, res) => {
     }
 }
 
-export const postOrder = async (req, res) => {
+
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY)
+
+export const getCheckout = async (req, res) => {
+
+    try {
+        const user = await User.findById(req.session.userId).populate('cart.items.productId')
+        if (!user) return res.redirect("/login")
+
+        const products = user.cart.items.map(
+            item => ({
+                product: item.productId,
+                quantity: item.quantity
+            })
+        ).filter(item => item.product)
+
+        const totalSum = products.reduce((sum, item) => {
+            return sum + item.product.price * item.quantity
+        }, 0)
+
+        const session = await stripe.checkout.sessions.create({
+            payment_method_types: ["card"],
+            mode: "payment",
+            line_items: products.map(item => ({
+                price_data: {
+                    currency: "eur",
+                    product_data: {
+                        name: item.product.title,
+                        description: item.product.description
+                    },
+                    unit_amount: item.product.price * 100
+                },
+                quantity: item.quantity
+            })),
+            success_url: req.protocol + '://' + req.get('host') + '/checkout/success',
+            cancel_url: req.protocol + '://' + req.get('host') + '/checkout/cancel'
+        })
+
+
+        res.render("shop/checkout", {
+            path: "/checkout",
+            pageTitle: "Checkout",
+            products: products,
+            totalSum: totalSum,
+            sessionId: session.id,
+            publicKey: process.env.STRIPE_PUBLIC_KEY
+
+        });
+    } catch (err) {
+        console.error(err)
+    }
+
+}
+
+
+export const getCheckoutSuccess = async (req, res) => {
 
     try {
         const user = await User.findById(req.session.userId);

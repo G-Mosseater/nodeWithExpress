@@ -28,6 +28,7 @@ const Store = MongoDBStore(session)
 
 
 app.set('view engine', 'ejs')
+app.use('/util', express.static('util'))
 
 const fileStorage = multer.diskStorage({
     destination: (req, file, cb) => {

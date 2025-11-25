@@ -175,8 +175,9 @@ export const postEditProduct = async (req, res) => {
 }
 
 
-export const postDeleteProduct = async (req, res) => {
-    const prodId = req.body.productId
+export const deleteProduct = async (req, res) => {
+
+    const prodId = req.params.productId
 
     if (!prodId || !mongoose.Types.ObjectId.isValid(prodId)) {
         return res.status(400).send("Invalid product ID")
@@ -197,10 +198,10 @@ export const postDeleteProduct = async (req, res) => {
 
         await Product.findByIdAndDelete(prodId)
 
-        res.redirect("/admin/products")
+        res.status(200).json({ message: "Success!" })
     }
     catch (err) {
-        console.error(err)
+        res.status(500).json({ message: "Deleting product failed!" })
     }
 }
 

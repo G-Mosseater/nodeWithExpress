@@ -46,14 +46,18 @@
               </div>
               <% }) %>
           </div>
-
+          <!-- 
           <form action="/create-order" method="POST">
             <input type="hidden" name="_csrf" value="<%= csrfToken %>">
             <button type="submit"
               style="background-color: #2ecc71; color: white; border: none; padding: 0.75rem 1.5rem; border-radius: 5px; cursor: pointer; display: block; margin: 1rem auto;">
               Order Now
             </button>
-          </form>
+          </form> -->
+          <a href="/checkout"
+            style="background-color: #2ecc71; color: white; border: none; padding: 0.75rem 1.5rem; border-radius: 5px; cursor: pointer; display: block; margin: 1rem auto;">
+            > Order Now</a>
+
 
           <% } else { %>
             <p>Your cart is empty.</p>
